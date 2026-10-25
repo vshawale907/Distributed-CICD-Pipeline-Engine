@@ -6,6 +6,12 @@ A self-hosted, distributed CI/CD pipeline engine. Push to GitHub → pipeline ru
 
 ---
 
+### 📘 Technical Documentation & Guides
+- **[CI/CD Engineer Interview Guide & User Manual](docs/interview-guide.md)**: Architectural deep-dive, system design Q&As, GitHub OAuth details, and usage manual.
+- **[Deployment Guide](docs/deploy.md)**: VPS & GCP Production Deployment Guides.
+
+---
+
 ## 🎯 Why This Project Stands Out (For Recruiters & Engineers)
 
 Most portfolio CI/CD projects simply call an existing cloud API (like GitHub Actions). **This project builds the pipeline engine itself from scratch.**
