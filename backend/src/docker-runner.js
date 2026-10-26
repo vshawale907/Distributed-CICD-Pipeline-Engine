@@ -1,12 +1,16 @@
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 
 function runStep(repoPath, command, onLog, image = 'node:18-alpine') {
   return new Promise((resolve, reject) => {
-    const dockerCmd = `docker run --rm -v "${repoPath}:/app" -w /app ${image} sh -c "${command}"`;
-
     console.log(`🐳 Docker: ${command}`);
 
-    const child = exec(dockerCmd, { timeout: 5 * 60 * 1000 });
+    const child = spawn('docker', [
+      'run', '--rm',
+      '-v', `${repoPath}:/app`,
+      '-w', '/app',
+      image,
+      'sh', '-c', command
+    ], { timeout: 5 * 60 * 1000 });
 
     child.stdout.on('data', (data) => {
       data.toString().split('\n')
@@ -26,3 +30,4 @@ function runStep(repoPath, command, onLog, image = 'node:18-alpine') {
 }
 
 module.exports = { runStep };
+
