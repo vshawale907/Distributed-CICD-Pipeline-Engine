@@ -28,15 +28,25 @@ pipelineQueue.process(2, async (job) => {
 
   let finalStatus = 'failed';
 
+  const writeLog = async (text, stepId = null) => {
+    publishLog(runId, text);
+    try {
+      await db.query(
+        `INSERT INTO logs (run_id, step_id, line) VALUES ($1, $2, $3)`,
+        [runId, stepId, text]
+      );
+    } catch (e) {}
+  };
+
   try {
     await db.query(`UPDATE runs SET status = 'running' WHERE id = $1`, [runId]);
-    publishLog(runId, `🚀 Pipeline started for commit ${commitSha}`);
+    await writeLog(`🚀 Pipeline started for commit ${commitSha}`);
 
-    publishLog(runId, `📦 Cloning ${repoUrl} (branch: ${branch})...`);
+    await writeLog(`📦 Cloning ${repoUrl} (branch: ${branch})...`);
     fs.mkdirSync(tmpDir, { recursive: true });
     const git = simpleGit();
     await git.clone(repoUrl, tmpDir, ['--branch', branch, '--depth', '1']);
-    publishLog(runId, `✅ Repository cloned`);
+    await writeLog(`✅ Repository cloned`);
 
     let config;
     const ymlPath  = path.join(tmpDir, '.pipeline.yml');
@@ -45,19 +55,19 @@ pipelineQueue.process(2, async (job) => {
 
     if (fs.existsSync(ymlPath)) {
       config = yaml.load(fs.readFileSync(ymlPath, 'utf8'));
-      publishLog(runId, `📋 Using config from .pipeline.yml`);
+      await writeLog(`📋 Using config from .pipeline.yml`);
     } else if (fs.existsSync(yamlPath)) {
       config = yaml.load(fs.readFileSync(yamlPath, 'utf8'));
-      publishLog(runId, `📋 Using config from .pipeline.yaml`);
+      await writeLog(`📋 Using config from .pipeline.yaml`);
     } else if (fs.existsSync(jsonPath)) {
       config = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-      publishLog(runId, `📋 Using config from .pipeline.json`);
+      await writeLog(`📋 Using config from .pipeline.json`);
     } else {
-      throw new Error('No pipeline config found. Add one of: .pipeline.yml, .pipeline.yaml, .pipeline.json');
+      throw new Error('No pipeline config found. Please add a .pipeline.json (or .pipeline.yml) to your repository.');
     }
 
     const steps = config.steps || [];
-    publishLog(runId, `📋 Found ${steps.length} step(s) to run`);
+    await writeLog(`📋 Found ${steps.length} step(s) to run`);
 
     let allPassed = true;
 
@@ -163,7 +173,7 @@ pipelineQueue.process(2, async (job) => {
       `UPDATE runs SET status = 'failed', completed_at = NOW() WHERE id = $1`,
       [runId]
     );
-    publishLog(runId, `❌ Fatal error: ${err.message}`);
+    await writeLog(`❌ Fatal error: ${err.message}`);
     publishLog(runId, `__PIPELINE_DONE__`);
 
     try {

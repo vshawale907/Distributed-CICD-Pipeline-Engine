@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
@@ -26,7 +24,7 @@ services:
     depends_on:
       - postgres
       - redis
-    env_file: .env
+    env_file: .env.development
     environment:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://cicd_user:cicd_pass@postgres:5432/cicd_db
@@ -41,7 +39,7 @@ services:
       - postgres
       - redis
       - server
-    env_file: .env
+    env_file: .env.development
     environment:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://cicd_user:cicd_pass@postgres:5432/cicd_db
