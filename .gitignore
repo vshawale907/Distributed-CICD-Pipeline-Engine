@@ -1,11 +1,16 @@
 node_modules
 frontend/node_modules
+backend/node_modules
 
 # ── Environment files (contain secrets) ──────────────────────
 .env
 .env.development
 .env.production
 .env.local
+backend/.env
+backend/.env.development
+backend/.env.production
+backend/.env.local
 frontend/.env
 frontend/.env.development
 frontend/.env.production
@@ -14,3 +19,4 @@ frontend/.env.local
 # ── Build artifacts ───────────────────────────────────────────
 dist/
 frontend/dist/
+backend/dist/

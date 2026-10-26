@@ -142,26 +142,27 @@ git clone https://github.com/vshawale907/cicd-engine.git
 cd cicd-engine
 
 # 2. Setup Environment Variables
-cp .env.example .env.development
-# Edit .env.development and fill in: JWT_SECRET, GITHUB_WEBHOOK_SECRET, FRONTEND_URL
+cp backend/.env.example backend/.env.development
+cp backend/.env.example backend/.env
 
 # 3. Start Infrastructure (Postgres + Redis)
-docker-compose up -d
+docker compose up -d
 
 # 4. Migrate Database & Create Admin
 npm run migrate
 ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=admin npm run seed:admin
 
 # 5. Start Backend Server (API + WebSockets)
-npm run dev
+# Either: npm run dev:backend (from root) or: cd backend && npm run dev
+npm run dev:backend
 
 # 6. Start Worker Engine (Job processing + Docker execution)
-# Run this in a separate terminal window
+# Run in a second terminal:
 npm run dev:worker
 
 # 7. Start Frontend Dashboard
-# Run this in a third terminal window
-cd frontend && npm install && npm run dev
+# Run in a third terminal:
+npm run dev:frontend
 ```
 
 Navigate to `http://localhost:5173` to log in and start using your local CI/CD Engine!

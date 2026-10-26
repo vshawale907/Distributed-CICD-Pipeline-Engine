@@ -8,7 +8,7 @@ services:
       POSTGRES_DB: cicd_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: unless-stopped
 
   redis:
@@ -18,13 +18,13 @@ services:
 
   server:
     build:
-      context: .
-      dockerfile: Dockerfile.server
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: cicd_server_prod
     depends_on:
       - postgres
       - redis
-    env_file: .env.development
+    env_file: ./backend/.env.development
     environment:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://cicd_user:cicd_pass@postgres:5432/cicd_db
@@ -32,14 +32,14 @@ services:
 
   worker:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.worker
     container_name: cicd_worker_prod
     depends_on:
       - postgres
       - redis
       - server
-    env_file: .env.development
+    env_file: ./backend/.env.development
     environment:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql://cicd_user:cicd_pass@postgres:5432/cicd_db
